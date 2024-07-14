@@ -1,0 +1,7 @@
+sqlalchemy==2.0.31
+pymysql==1.1.0
+pydantic==2.3.0
+alembic==1.12.0
+pydantic-settings==2.3.4
+zigpy-znp==0.12.3
+
