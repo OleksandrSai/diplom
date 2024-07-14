@@ -1,16 +1,17 @@
 import asyncio
 from zigpy_znp.zigbee.application import ControllerApplication
-from listner import Listener
+from .listener import Listener
 import zigpy_znp.types as t
+from config import settings
 
 
 class Controller:
     def __init__(self):
         self.app = None
-        self.pan_id = 1996
-        self.chanel = 15
-        self.serial_port = "COM4"
-        self.key = "99ffff33445566778899aabbccd11111"
+        self.pan_id = settings.ZIGBEE_PAN_ID
+        self.chanel = settings.ZIGBEE_CHANEL
+        self.serial_port = settings.ZIGBEE_SERIAL_PORT
+        self.key = settings.ZIGBEE_KEY
         self.configurate_controller()
 
     @staticmethod
@@ -48,8 +49,3 @@ class Controller:
 
     def start_controller(self):
         asyncio.run(self.start())
-
-
-if __name__ == "__main__":
-    controller = Controller()
-    controller.start_controller()
