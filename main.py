@@ -1,16 +1,12 @@
 import threading
-
-
-def thread_1():
-    pass
-
+from zigbee.сontroller import Controller
 
 def thread_2():
     pass
 
-
 def start_project():
-    thread_zigbee = threading.Thread(target=thread_1)
+    zigbee_controller = Controller()
+    thread_zigbee = threading.Thread(target=zigbee_controller.start_controller)
     thread_api = threading.Thread(target=thread_2)
 
     thread_zigbee.start()
