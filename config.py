@@ -8,8 +8,9 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     DB_NAME: str
-    HOST: str = "0"
+    HOST: str = "127.0.0.1"
     PORT: int = 8000
+    API_PREFIX: str = '/api'
     ZIGBEE_PAN_ID: int
     ZIGBEE_CHANEL: int
     ZIGBEE_KEY: str
