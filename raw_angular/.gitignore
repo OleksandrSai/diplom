@@ -1,14 +1,13 @@
-venv
-__pycache__
-.idea
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-raw_angular/dist
-raw_angular/tmp
-raw_angular/out-tsc
-raw_angular/bazel-out
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
 
 # Node
-raw_angular/node_modules
+/node_modules
 npm-debug.log
 yarn-error.log
 
@@ -30,13 +29,13 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-raw_angular/.angular/cache
+/.angular/cache
 .sass-cache/
-raw_angular/connect.lock
-raw_angular/coverage
-raw_angular/libpeerconnection.log
-raw_angular/testem.log
-raw_angular/typings
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
 
 # System files
 .DS_Store

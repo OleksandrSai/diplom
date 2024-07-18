@@ -1,8 +1,8 @@
 import asyncio
 from zigpy_znp.zigbee.application import ControllerApplication
-from .listener import Listener
-import zigpy_znp.types as t
+from zigpy.types import t
 from config import settings
+from .listener import Listener
 
 
 class Controller:
@@ -42,10 +42,14 @@ class Controller:
             listener.device_initialized(device, new=False)
 
         await self.app.permit(60)
-
-        await asyncio.sleep(60)
-
         await asyncio.get_running_loop().create_future()
 
-    def start_controller(self):
-        asyncio.run(self.start())
+    async def turn_on_device(self, device_id):
+        device = self.app.get_device(nwk=device_id)
+        if device:
+            await device.endpoints[1].on_off.on()
+
+    async def turn_off_device(self, device_id):
+        device = self.app.get_device(nwk=device_id)
+        if device:
+            await device.endpoints[1].on_off.off()

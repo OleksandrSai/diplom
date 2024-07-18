@@ -1,18 +1,10 @@
 import threading
 from zigbee.сontroller import Controller
 from api.app import start_api
-
+import time
 
 def start_project():
-    zigbee_controller = Controller()
-    thread_zigbee = threading.Thread(target=zigbee_controller.start_controller)
-    thread_api = threading.Thread(target=start_api)
-
-    thread_zigbee.start()
-    thread_api.start()
-
-    thread_zigbee.join()
-    thread_api.join()
+   start_api()
 
 
 if __name__ == '__main__':
