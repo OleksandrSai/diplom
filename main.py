@@ -1,7 +1,5 @@
-import threading
-from zigbee.сontroller import Controller
 from api.app import start_api
-import time
+
 
 def start_project():
    start_api()
