@@ -1,4 +1,4 @@
-from api.app import start_api
+from app.app import start_api
 
 
 def start_project():

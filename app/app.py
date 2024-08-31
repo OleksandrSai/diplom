@@ -2,7 +2,7 @@ from config import settings
 from fastapi import FastAPI, WebSocket
 import uvicorn
 from .router import router as scheduler_router
-from zigbee.сontroller import Controller
+from .services.zigbee.сontroller import Controller
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -83,6 +83,6 @@ async def hello_index():
 
 
 def start_api():
-    uvicorn.run("api.app:app", host=settings.API_HOST, port=settings.API_PORT, reload=False)
+    uvicorn.run("app.app:app", host=settings.API_HOST, port=settings.API_PORT, reload=False)
 
 

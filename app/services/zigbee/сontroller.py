@@ -1,6 +1,5 @@
 import asyncio
 import json
-
 from zigpy_znp.zigbee.application import ControllerApplication
 from zigpy.types import t
 from config import settings
@@ -65,7 +64,6 @@ class Controller:
         except Exception as e:
             print(e)
 
-
     def configurate_controller(self):
             self.app = ControllerApplication(ControllerApplication.SCHEMA({
                 "start_radio": True,
@@ -86,8 +84,6 @@ class Controller:
         await self.app.startup(auto_form=True)
         for device in self.app.devices.values():
             self.listener.device_initialized(device, new=True)
-
-
 
         await self.app.permit(60)
 

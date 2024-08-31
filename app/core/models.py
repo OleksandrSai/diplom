@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, text, Boolean
 from .base import Base, str_256
 from zigpy.profiles.zha import DeviceType
-from utils.enum import Strategy
+from app.utils.enum import Strategy
 from typing import Optional, Annotated
 
 created_at = Annotated[datetime.datetime, mapped_column(server_default=text("NOW()"))]
@@ -16,8 +16,8 @@ class Device(Base):
     type: Mapped[DeviceType]
     nwk_adr: Mapped[str_256]
     status: Mapped[bool]
-    date_turn_on = Mapped[datetime.datetime]
-    date_turn_off = Mapped[Optional[datetime.datetime]]
+    date_turn_on: Mapped[Optional[datetime.datetime]]
+    date_turn_off: Mapped[Optional[datetime.datetime]]
 
 
 class Group(Base):

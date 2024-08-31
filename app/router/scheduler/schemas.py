@@ -17,3 +17,11 @@ class SchedulerDTO(SchedulerBaseDTO):
 
 class SchedulerCreateDTO(SchedulerBaseDTO):
     pass
+
+
+class SchedulerUpdateDTO(SchedulerCreateDTO):
+    pass
+
+
+class SchedulerUpdatePartialDTO(SchedulerCreateDTO):
+    pass

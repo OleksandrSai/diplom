@@ -7,13 +7,14 @@ import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { Subscription } from 'rxjs';
-import { WebsocketService } from '../../shared/websocket.service';
 import { DevicesService } from '../../shared/service/devices.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-devices',
   standalone: true,
   imports: [
+    CommonModule,
     NzButtonModule,
     NzTableModule,
     NzIconModule,
@@ -36,14 +37,12 @@ export class DevicesComponent {
   selectedFilter:number = 0
   searchText:string=""
 
-
-
-  constructor(private websocketService: DevicesService) {}
+  constructor(private diveceService: DevicesService) {}
   messages: string[] = [];
 
   ngOnInit(): void {
     this.loadData()
-    this.websocketService.onMessage().subscribe(message => {
+    this.diveceService.onMessage().subscribe(message => {
       console.log(message)
       this.messages.push(message);
     });
@@ -68,12 +67,18 @@ export class DevicesComponent {
 
 
   loadData(): void {
-    // if (this.aSub) this.aSub.unsubscribe();
-    // this.aSub = this.serviceGroup.getGroups(this.pageIndex, this.pageSize, this.selectedFilter, this.searchText).subscribe((res: ItemsResponse) =>
-    //   {
-    //     this.arrData = res.items as GroupInfo[]
-    //     this.totalItems = res.totalItems
-    //   })
+    if (this.aSub) this.aSub.unsubscribe();
+    this.aSub = this.diveceService.getAllDevices(this.pageIndex, this.pageSize, this.searchText).subscribe((res: any) =>
+
+      {
+        res.items.forEach((element:any) => {
+          element.instantCurrent = 0;
+          element.instantVoltage = 0;
+          element.totalConsumption = 0;
+        });
+        this.arrData = res.items
+        this.totalItems = res.totalItems
+      })
   }
 
 

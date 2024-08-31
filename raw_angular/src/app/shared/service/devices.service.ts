@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Observer, Subject } from 'rxjs';
 
@@ -6,11 +7,15 @@ import { Observable, Observer, Subject } from 'rxjs';
 })
 export class DevicesService {
 
+  constructor(private http: HttpClient) {
+    this.connect();
+  }
+
   socket!: WebSocket;
   messageSubject = new Subject<any>();
 
-  constructor() {
-    this.connect();
+  getAllDevices(pageIndex: number, pageSize: number, searchText:string): Observable<any[]>{
+    return this.http.get<any[]>(`/api/device/?startIndex=${pageIndex}&pageSize=${pageSize}&searchText=${searchText}`)
   }
 
   private connect(): void {

@@ -1,32 +1,12 @@
-import asyncio
 from datetime import datetime, timedelta
 from croniter import croniter
 import calendar
-import threading
+from .orm import SchedulerOrm
 
 
 class Scheduler:
     def __init__(self, **kwargs):
-        self.first_start = True
-        self.time_first_start = 0
-        self.time_wait = 10
-        self.async_orm = AsyncCoreScheluderOrm()
-        self.meter_manager = Manager()
-
-    async def engine_scheduler(self):
-        while True:
-            try:
-                await asyncio.sleep(self.time_wait)
-                num_threads = threading.active_count()
-                print(f"[Проверка]: Количество активных потоков: {num_threads}")
-                if self.first_start:
-                    await asyncio.sleep(self.time_first_start)
-                    self.first_start = False
-                    continue
-                await self.meter_manager.check_new_meters()
-                await self.data_waiter()
-            except Exception as e:
-                print(e)
+        self.async_orm = SchedulerOrm()
 
     async def data_waiter(self):
         self.data = await self.async_orm.get_all_scheduler_with_name()

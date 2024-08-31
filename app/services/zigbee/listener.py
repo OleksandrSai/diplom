@@ -4,6 +4,7 @@ from zigpy.zcl.clusters.general import Identify
 
 import asyncio
 
+
 class Listener:
 
     def __init__(self, application):

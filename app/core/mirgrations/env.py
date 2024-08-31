@@ -3,7 +3,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from config import settings
 from api.core.models import Device # noqa
-from api.core.base import Base
+from app.core.base import Base
 from alembic import context
 
 config = context.config
