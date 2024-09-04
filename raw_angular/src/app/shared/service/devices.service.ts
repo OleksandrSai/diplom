@@ -19,7 +19,7 @@ export class DevicesService {
   }
 
   private connect(): void {
-    this.socket = new WebSocket('ws://localhost:8000/ws');
+    this.socket = new WebSocket('ws://localhost:8000/api/ws');
 
     this.socket.onopen = (event) => {
       console.log('Connected to WebSocket server.');

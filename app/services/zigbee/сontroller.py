@@ -1,11 +1,15 @@
 import asyncio
 import json
 from zigpy_znp.zigbee.application import ControllerApplication
-from zigpy.types import t
 from config import settings
 from .listener import Listener
 import async_timeout
 from zigpy import types as t
+from zigpy.types import EUI64
+from app.utils.orm import UtilsOrm
+from zigpy.device import Device
+from zigpy.types import NWK
+from zigpy.zcl.clusters.general import OnOff
 
 
 class Controller:
@@ -18,6 +22,7 @@ class Controller:
         self.configurate_controller()
         self.shutdown_event = None
         self.listener = None
+        self.async_orm = UtilsOrm()
 
     @staticmethod
     def key_from_hex(key_value) -> t.KeyData:
@@ -41,49 +46,62 @@ class Controller:
             print(f"Error reading attributes {attribute_ids} from cluster {cluster.cluster_id}: {e}")
             return {}
 
-    async def read_interval(self):
+    async def read_device(self, nwk_address: int, ieee: EUI64):
         try:
-            device = self.app.get_device(nwk=0xFF15)
-            attribute_ids = [0x0000]  # Current Summation Delivered and Instantaneous Demand
+
+            device = self.app.get_device(nwk=nwk_address)
+
+            attribute_ids = [0x0000]
             endpoint = device.endpoints[1]
             attr_dict, _ = await endpoint.smartenergy_metering.read_attributes(attribute_ids)
-            total_energy = attr_dict.get(0x0000)  # Total energy in kWh
-            if total_energy:
-                print(total_energy * 10000000)
-            print(f"Total Energy: {total_energy * 100} kWh")
+            total_energy = attr_dict.get(0x0000)
+            # print(f"Total Energy: {total_energy} kWh")
             attribute_ids = [0x050B]
             attr_dict, _ = await endpoint.electrical_measurement.read_attributes(attribute_ids)
             current_power = attr_dict.get(0x050B, 0)
-            print(f"Current Power: {current_power} W")
-            dict_data = {
+            # print(f"Current Power: {current_power} W")
+            return {
                 "current_power": current_power,
                 "total_energy": total_energy
             }
-            res = json.dumps(dict_data)
-            return res
         except Exception as e:
             print(e)
 
     def configurate_controller(self):
-            self.app = ControllerApplication(ControllerApplication.SCHEMA({
-                "start_radio": True,
-                "network": {
-                    "channel": self.chanel,
-                    "pan_id": 0x1a2b,  # PAN ID
-                    "key": Controller.key_from_hex(self.key)
-                },
-                "device": {
-                    "path": self.serial_port,
-                }
-            }))
+        self.app = ControllerApplication(ControllerApplication.SCHEMA({
+            "start_radio": True,
+            "network": {
+                "channel": self.chanel,
+                "pan_id": 0x1a2b,  # PAN ID
+                "key": Controller.key_from_hex(self.key)
+            },
+            "device": {
+                "path": self.serial_port,
+            }
+        }))
+
+    # @staticmethod
+    # def ieee_string_to_eui64(ieee_str):
+    #     return EUI64(bytes.fromhex(ieee_str.replace(':', '')))
+
+    # async def initialize_device_from_bd(self) -> None:
+    #     device_data: list[tuple[int, str]] = await self.async_orm.get_all_devices_adr()
+    #     if device_data:
+    #         for nwk_address, ieee in device_data:
+    #             device = Device(
+    #                 application=self.app,
+    #                 ieee=Controller.ieee_string_to_eui64(ieee),
+    #                 nwk=NWK(nwk_address & 0xFFFF))
+    #             self.app.devices[Controller.ieee_string_to_eui64(ieee)] = device
+    #
+    #             self.listener.device_initialized(device, new=True)
 
     async def start(self):
         self.shutdown_event = asyncio.Event()
         self.listener = Listener(self.app)
         self.app.add_listener(self.listener)
         await self.app.startup(auto_form=True)
-        for device in self.app.devices.values():
-            self.listener.device_initialized(device, new=True)
+        # await self.initialize_device_from_bd()
 
         await self.app.permit(60)
 

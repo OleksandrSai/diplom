@@ -5,9 +5,11 @@ from app.core.models import Device
 from .schemas import DevicesCreateDTO, DevicesUpdatePartialDTO, DevicesUpdateDTO
 
 
-async def get_devices(session: AsyncSession, offset: int = 0, limit: int = 10, search: str = "") -> (
-        tuple[list[Device], int]):
+async def get_devices(session: AsyncSession, offset: int = 0, limit: int = 0, search: str = "") -> (
+        tuple[list[Device], int] | list[Device]):
     base_query = select(Device).order_by(Device.id)
+
+    total_items = None
 
     if search:
         search_pattern = f"%{search}%"
@@ -17,18 +19,21 @@ async def get_devices(session: AsyncSession, offset: int = 0, limit: int = 10, s
             )
         )
 
-    subquery = base_query.subquery()
-    count_query = select(func.count()).select_from(subquery)
+    if limit:
+        subquery = base_query.subquery()
+        count_query = select(func.count()).select_from(subquery)
+        paginated_query = base_query.offset(offset).limit(limit)
+        total_items_result = await session.execute(count_query)
+        total_items = total_items_result.scalar()
+        result = await session.execute(paginated_query)
+    else:
+        result = await session.execute(base_query)
 
-    paginated_query = base_query.offset(offset).limit(limit)
-
-    result = await session.execute(paginated_query)
     devices = result.scalars().all()
-
-    total_items_result = await session.execute(count_query)
-    total_items = total_items_result.scalar()
-
-    return list(devices), total_items
+    if limit:
+        return list(devices), total_items
+    else:
+        return list(devices)
 
 
 async def get_device(session: AsyncSession, device_id: int) -> Device | None:

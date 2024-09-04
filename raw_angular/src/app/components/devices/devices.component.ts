@@ -41,14 +41,22 @@ export class DevicesComponent {
   messages: string[] = [];
 
   ngOnInit(): void {
+    this.loadInfoDevice()
     this.loadData()
-    this.diveceService.onMessage().subscribe(message => {
-      console.log(message)
-      this.messages.push(message);
-    });
+
 
   }
 
+  loadInfoDevice(){
+  this.diveceService.onMessage().subscribe(message => {
+    let currentParams:any[] = JSON.parse(message)
+    currentParams.forEach((el:any)=>{
+
+    })
+
+    // this.messages.push(message);
+  });
+  }
 
   get pageSize(): number {
     return Number(this._pageSize);
@@ -76,6 +84,8 @@ export class DevicesComponent {
           element.instantVoltage = 0;
           element.totalConsumption = 0;
         });
+        console.log(res.items)
+        this.diveceService.sendMessage(JSON.stringify(res.items))
         this.arrData = res.items
         this.totalItems = res.totalItems
       })

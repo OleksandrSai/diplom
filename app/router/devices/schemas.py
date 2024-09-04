@@ -1,23 +1,25 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 from zigpy.profiles.zha import DeviceType
 
 
 class DevicesBaseDTO(BaseModel):
-    address: str
-    name: str
-    type: DeviceType
-    nwk_adr: str
-    status: bool
-    date_turn_on: Optional[datetime]
-    date_turn_off: Optional[datetime]
+    ieee: str
+    name: Optional[str] = None
+    type: DeviceType = Field(default=DeviceType(0x0000))
+    nwk_adr: int
+    status: bool = Field(default=False)
+    date_turn_on: Optional[datetime] = None
+    date_turn_off: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class DevicesDTO(DevicesBaseDTO):
     id: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DevicesCreateDTO(DevicesBaseDTO):

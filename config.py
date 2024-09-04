@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     ZIGBEE_CHANEL: int = 15
     ZIGBEE_KEY: str
     ZIGBEE_SERIAL_PORT: str = "COM4"
+    SCHEDULER_FIRST_POLL_SEC: int = 50
+    SCHEDULER_POLLING_RATE_SEC: int = 15
 
     @property
     def DATABASE_URL_pymysql(self):

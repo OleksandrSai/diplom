@@ -11,11 +11,11 @@ update = Annotated[datetime.datetime, mapped_column(server_default=text("NOW()")
 
 
 class Device(Base):
-    address: Mapped[str_256]
-    name: Mapped[str_256]
+    ieee: Mapped[str_256]
+    name: Mapped[Optional[str_256]]
     type: Mapped[DeviceType]
-    nwk_adr: Mapped[str_256]
-    status: Mapped[bool]
+    nwk_adr: Mapped[int]
+    status: Mapped[bool] = mapped_column(default=False)
     date_turn_on: Mapped[Optional[datetime.datetime]]
     date_turn_off: Mapped[Optional[datetime.datetime]]
 

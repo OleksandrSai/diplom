@@ -2,18 +2,43 @@ from datetime import datetime, timedelta
 from croniter import croniter
 import calendar
 from .orm import SchedulerOrm
+import asyncio
+import threading
+from config import settings
+from .smart_reader.smart_reader import SmartReader
 
 
 class Scheduler:
-    def __init__(self, **kwargs):
+    def __init__(self, controller):
+        self.first_start = True
+        self.time_first_start = settings.SCHEDULER_FIRST_POLL_SEC
+        self.time_wait = settings.SCHEDULER_POLLING_RATE_SEC
         self.async_orm = SchedulerOrm()
+        self.smart_reader = SmartReader(controller)
+        self.data = None
+
+    async def start(self):
+        while True:
+            try:
+                await asyncio.sleep(self.time_wait)
+                num_threads = threading.active_count()
+                print(f"[Проверка]: Количество активных потоков: {num_threads}")
+                if self.first_start:
+                    await asyncio.sleep(self.time_first_start)
+                    self.first_start = False
+                    continue
+                await self.data_waiter()
+                await self.smart_reader.raed_all_devices()
+            except Exception as e:
+                print(e)
 
     async def data_waiter(self):
-        self.data = await self.async_orm.get_all_scheduler_with_name()
+        self.data = await self.async_orm.get_all_scheduler()
         if self.data:
             await self.data_parser()
 
     async def data_parser(self):
+        print(self.data)
         for key in self.data:
             group_id = key['group_id']
             cron_id = key['id']
@@ -38,7 +63,7 @@ class Scheduler:
                 next_cron_time = last_poll_time + timedelta(minutes=number)
 
             if next_cron_time <= current_time:
-                GroupReader(group_id, cron_id, current_time, pause)
+                print("Hello")
 
     @staticmethod
     def is_interval_cron(cron_expression):

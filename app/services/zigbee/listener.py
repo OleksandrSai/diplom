@@ -1,6 +1,9 @@
 from zigpy.zcl.clusters.smartenergy import Metering
 from zigpy.zcl.clusters.homeautomation import ElectricalMeasurement
 from zigpy.zcl.clusters.general import Identify
+from app.utils.orm import UtilsOrm
+from zigpy_znp.zigbee.device import ZNPCoordinator
+
 
 import asyncio
 
@@ -9,20 +12,18 @@ class Listener:
 
     def __init__(self, application):
         self.application = application
+        self.async_orm = UtilsOrm()
 
     def device_joined(self, device):
         print(f"Device joined: {device}")
 
-
     def device_initialized(self, device, *, new=True):
         print(f"new divice  ready {device}")
-        # for ep_id, endpoint in device.endpoints.items():
-        #
-        #     if ep_id == 0:
-        #         continue
-        #
-        #     for cluster in endpoint.in_clusters.values():
-        #         cluster.add_context_listener(self)
+        if not isinstance(device, ZNPCoordinator):
+            try:
+                asyncio.run(self.async_orm.add_device(nwk_adr=int(device.nwk), ieee=str(device.ieee)))
+            except Exception as exc:
+                print(exc)
 
     def attribute_updated(self, cluster, attribute_id, value, date):
         print(cluster)

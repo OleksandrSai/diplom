@@ -7,7 +7,7 @@ from .schemas import SchedulerCreateDTO, SchedulerUpdatePartialDTO, SchedulerUpd
 
 
 async def get_schedulers(session: AsyncSession) -> list[Scheduler]:
-    stmt = select(Scheduler).order_by(Scheduler.id)
+    stmt = select(Scheduler)
     result: Result = await session.execute(stmt)
     schedulers = result.scalars().all()
     return list(schedulers)
