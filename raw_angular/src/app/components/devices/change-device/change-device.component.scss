@@ -1,0 +1,29 @@
+.modal {
+    width: 350px;
+    height: 200px;
+    border-radius: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    .nav {
+        position: absolute;
+        right: 10px;
+        top: 5px;
+    }
+    .block {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+    }
+    .block_button {
+        margin-top: 20px;
+    }
+}
+
+::ng-deep .mat-mdc-dialog-surface,
+.mdc-dialog__surface {
+    border-radius: 0 !important;
+}

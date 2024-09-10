@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { PageComponent } from './components/page/page.component';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, PageComponent],
+  imports: [RouterOutlet, PageComponent,
+    ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

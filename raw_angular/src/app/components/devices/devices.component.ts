@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -9,6 +9,12 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { Subscription } from 'rxjs';
 import { DevicesService } from '../../shared/service/devices.service';
 import { CommonModule } from '@angular/common';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzStatisticModule } from 'ng-zorro-antd/statistic';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { MatDialog } from '@angular/material/dialog';
+import { ChangeDeviceComponent } from './change-device/change-device.component';
 
 @Component({
   selector: 'app-devices',
@@ -21,13 +27,21 @@ import { CommonModule } from '@angular/common';
     NzPaginationModule,
     NzSelectModule,
     NzInputModule,
-    FormsModule],
+    FormsModule,
+    NzSwitchModule,
+    NzCardModule,
+    NzStatisticModule,
+    NzModalModule],
   templateUrl: './devices.component.html',
   styleUrl: './devices.component.scss'
 })
 export class DevicesComponent {
 
+  @ViewChild('prefixTplOne', { static: true }) prefixTplOne: TemplateRef<any> | undefined;
+  @ViewChild('prefixTplTwo', { static: true }) prefixTplTwo: TemplateRef<any> | undefined;
+
   aSub: Subscription | undefined;
+  bSub: Subscription | undefined;
   cSub: Subscription | undefined;
   pageSizes: number [] = [10, 25, 50];
   _pageSize: string = "10";
@@ -36,31 +50,63 @@ export class DevicesComponent {
   totalItems: number | undefined
   selectedFilter:number = 0
   searchText:string=""
+  intervalId: any
+  flagButtonUpdate:boolean = false
+  timeoutId: any;
+  totalCurrent:number = 0.0
+  totalVoltage:number = 0.0
 
-  constructor(private diveceService: DevicesService) {}
+  selectedPrefixVoltage: any;
+  selectedPrefixAmpere:any;
+
+
+
+  constructor(private deviceService: DevicesService, public dialog: MatDialog) {}
   messages: string[] = [];
 
   ngOnInit(): void {
     this.loadInfoDevice()
     this.loadData()
+    this.selectedPrefixVoltage = this.prefixTplOne
+    this.selectedPrefixAmpere = this.prefixTplOne
 
 
   }
 
-  loadInfoDevice(){
-  this.diveceService.onMessage().subscribe(message => {
-    let currentParams:any[] = JSON.parse(message)
-    currentParams.forEach((el:any)=>{
+  openEditWindow(element:any): void {
+    const dialogRef = this.dialog.open(ChangeDeviceComponent, {
+      data: element
+    });
 
+    dialogRef.afterClosed().subscribe((result:any) => {
+      console.log('Диалоговое окно закрыто', result);
+    });
+  }
+
+  changeState(state:boolean, nwk_adr:number): void{
+    this.flagButtonUpdate = true
+    clearTimeout(this.timeoutId)
+    this.cSub = this.deviceService.changeState(nwk_adr, state).subscribe((res:boolean)=>{
+      if (res == state){
+        this.timeoutId =setTimeout(() => {
+          this.flagButtonUpdate = false
+        }, 3000);
+      }else{
+        this.flagButtonUpdate = false
+      }
     })
-
-    // this.messages.push(message);
-  });
   }
 
   get pageSize(): number {
     return Number(this._pageSize);
   }
+
+
+
+
+
+
+
 
 
   onPageIndexChange(newPageIndex: number): void {
@@ -73,42 +119,78 @@ export class DevicesComponent {
     this.loadData()
   }
 
+  loadInfoDevice(): void {
+    this.deviceService.onMessage().subscribe(message => {
+      console.log(message)
+      let currentParams:any[] = JSON.parse(message)
+      const oldTotalCurrent = this.totalCurrent
+      const oldTotalVoltage = this.totalVoltage
+
+      this.totalCurrent = 0.0
+      this.totalVoltage = 0.0
+      currentParams.forEach((el: any) => {
+        const found = this.arrData.find((item: any) => item.nwk_adr === el.nwk_adr);
+
+        if (found) {
+            found.instantVoltage = el.current_power;
+            found.instantCurrent = el.current_current;
+            found.total_energy = el.total_energy;
+            if (!this.flagButtonUpdate){
+            found.state = el.current_state
+
+            this.totalCurrent += el.current_current;
+            this.totalVoltage += el.current_power;
+          }
+          }
+        })
+
+        this.selectedPrefixVoltage = this.totalVoltage > oldTotalVoltage ? this.prefixTplOne : this.prefixTplTwo;
+        this.selectedPrefixAmpere = this.totalCurrent > oldTotalCurrent ? this.prefixTplOne : this.prefixTplTwo;
+      })
+    }
+
+    changeColor(prefix: any): boolean {
+      if (prefix == this.prefixTplTwo){
+        return true
+      }else{
+        return false
+      }
+
+    }
+
 
   loadData(): void {
     if (this.aSub) this.aSub.unsubscribe();
-    this.aSub = this.diveceService.getAllDevices(this.pageIndex, this.pageSize, this.searchText).subscribe((res: any) =>
+    this.aSub = this.deviceService.getAllDevices(this.pageIndex, this.pageSize, this.searchText).subscribe((res: any) =>
 
       {
         res.items.forEach((element:any) => {
-          element.instantCurrent = 0;
-          element.instantVoltage = 0;
-          element.totalConsumption = 0;
+          element.instantCurrent = null;
+          element.instantVoltage = null;
+          element.total_energy = null;
+          element.state = null;
         });
-        console.log(res.items)
-        this.diveceService.sendMessage(JSON.stringify(res.items))
+
         this.arrData = res.items
         this.totalItems = res.totalItems
+        this.startAutoUpdate()
       })
   }
 
 
-  openDialog(): void {
-    // const dialogRef = this.dialog.open(GroupAddComponent);
-    // this.cSub = dialogRef.afterClosed().subscribe(result => this.loadData());
+  startAutoUpdate(): void {
+    this.deviceService.sendMessage(JSON.stringify(this.arrData))
+    if (this.intervalId) clearInterval(this.intervalId);
+
+    this.intervalId = setInterval(() => {
+      this.deviceService.sendMessage(JSON.stringify(this.arrData))
+      },  3000);
   }
 
+  deleteDevice(device_id: number){
 
-  openEditWindow(element:any): void {
-  //   const dialogRef = this.dialog.open(GroupEditComponent, {
-  //     data: element
-  // })
-  //   this.cSub = dialogRef.afterClosed().subscribe(result => this.loadData());
   }
 
-
-  deleteGroup(id:number): void {
-    // this.cSub = this.serviceGroup.deleteGroup(id).subscribe((el)=> this.loadData())
-  }
 
 
   search(value:string): void {
@@ -119,6 +201,7 @@ export class DevicesComponent {
 
   ngOnDestroy(): void {
     this.aSub?.unsubscribe();
+    this.bSub?.unsubscribe();
     this.cSub?.unsubscribe();
   }
 

@@ -6,6 +6,7 @@ from app.core.async_database import async_database
 from .schemas import DevicesDTO
 from .dependencies import device_by_id
 from app.core.models import Device
+from app.services.zigbee.сontroller import controller
 
 router = APIRouter(tags=["device"])
 
@@ -35,6 +36,18 @@ async def get_device(device_id: int, session: AsyncSession = Depends(async_datab
 async def create_device(device_in: DevicesCreateDTO,
                         session: AsyncSession = Depends(async_database.get_scoped_session)):
     return await crud.create_device(session=session, device_in=device_in)
+
+
+@router.get("/change_state")
+async def change_state(
+    nwk_adr: int = Query(..., alias="nwk_adr", description="nwk_adr"),
+    state: bool = Query(..., alias="state", description="Device state")
+):
+
+    try:
+        return await controller.change_state_device(nwk_adr=nwk_adr, state=state)
+    except Exception as exc:
+        return f"Error: {exc}"
 
 
 @router.put("/{device_id}/")

@@ -14,13 +14,13 @@ class Settings(BaseSettings):
     ZIGBEE_PAN_ID: int = 1996
     ZIGBEE_CHANEL: int = 15
     ZIGBEE_KEY: str
-    ZIGBEE_SERIAL_PORT: str = "COM4"
-    SCHEDULER_FIRST_POLL_SEC: int = 50
-    SCHEDULER_POLLING_RATE_SEC: int = 15
+    ZIGBEE_SERIAL_PORT: str = "COM6"
+    SCHEDULER_FIRST_POLL_SEC: int = 60
+    SCHEDULER_POLLING_RATE_SEC: int = 3
 
     @property
     def DATABASE_URL_pymysql(self):
-        return f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"mysql+asyncmy://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     model_config = SettingsConfigDict(env_file=".env")
 

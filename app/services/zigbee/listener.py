@@ -1,18 +1,17 @@
-from zigpy.zcl.clusters.smartenergy import Metering
 from zigpy.zcl.clusters.homeautomation import ElectricalMeasurement
-from zigpy.zcl.clusters.general import Identify
 from app.utils.orm import UtilsOrm
 from zigpy_znp.zigbee.device import ZNPCoordinator
-
-
 import asyncio
+import nest_asyncio
 
 
 class Listener:
 
     def __init__(self, application):
+        nest_asyncio.apply()
         self.application = application
         self.async_orm = UtilsOrm()
+        self.device_initialized_callback = None
 
     def device_joined(self, device):
         print(f"Device joined: {device}")
@@ -22,8 +21,9 @@ class Listener:
         if not isinstance(device, ZNPCoordinator):
             try:
                 asyncio.run(self.async_orm.add_device(nwk_adr=int(device.nwk), ieee=str(device.ieee)))
-            except Exception as exc:
-                print(exc)
+            except:
+                pass
+
 
     def attribute_updated(self, cluster, attribute_id, value, date):
         print(cluster)

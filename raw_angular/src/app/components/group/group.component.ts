@@ -8,6 +8,7 @@ import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-group',
@@ -17,6 +18,7 @@ import { FormsModule } from '@angular/forms';
     NzIconModule,
     NzPaginationModule,
     NzSelectModule,
+    CommonModule,
     NzInputModule,
     FormsModule],
   templateUrl: './group.component.html',

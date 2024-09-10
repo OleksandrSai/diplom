@@ -3,14 +3,13 @@ from config import settings
 from fastapi import FastAPI
 import uvicorn
 from .router import router as united_router
-from .services.zigbee.сontroller import Controller
+from .services.zigbee.сontroller import controller
 from .services.scheduler.scheduler import Scheduler
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
-controller = Controller()
 scheduler = Scheduler(controller)
 
 
@@ -36,6 +35,6 @@ async def startup_event():
 
 
 def start_api():
-    uvicorn.run("app.app:app", host=settings.API_HOST, port=settings.API_PORT, reload=False)
+    uvicorn.run("app.app:app", host=settings.API_HOST, port=settings.API_PORT, reload=True)
 
 

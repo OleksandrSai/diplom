@@ -9,3 +9,4 @@ class Strategy(enum.Enum):
     PercentageOfNetworkLoad = 5
     DurationOfOperatingTimeAtHighPower = 6
     AverageEnergyConsumptionPerHour = 7
+

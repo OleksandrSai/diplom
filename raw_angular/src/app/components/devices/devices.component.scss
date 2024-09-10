@@ -1,0 +1,17 @@
+.option {
+    display: flex;
+    justify-content: space-between;
+}
+
+::ng-deep .mat-mdc-dialog-component-host {
+    border-radius: 0px;
+}
+
+::ng-deep .mat-dialog-container {
+    border-radius: 0 !important;
+    /* Убираем закругление */
+}
+
+svg {
+    cursor: pointer;
+}
