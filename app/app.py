@@ -35,6 +35,6 @@ async def startup_event():
 
 
 def start_api():
-    uvicorn.run("app.app:app", host=settings.API_HOST, port=settings.API_PORT, reload=True)
+    uvicorn.run("app.app:app",  host=settings.API_HOST, port=settings.API_PORT, reload=True)
 
 

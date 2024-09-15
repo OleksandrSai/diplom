@@ -21,3 +21,8 @@ class StatisticDTO(StatisticBaseDTO):
 
 class StatisticCreateDTO(StatisticBaseDTO):
     pass
+
+
+class StatisticResponse(BaseModel):
+    items: list[StatisticDTO]
+    totalItems: int

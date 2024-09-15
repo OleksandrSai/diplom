@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_, func
 from app.core.models import Device
 from .schemas import DevicesCreateDTO, DevicesUpdatePartialDTO, DevicesUpdateDTO
-from app.utils.orm import utils
+from app.utils.dependencies import get_data
 
 
 async def get_devices(session: AsyncSession, offset: int = 0, limit: int = 0, search: str = "") -> (
@@ -18,7 +18,9 @@ async def get_devices(session: AsyncSession, offset: int = 0, limit: int = 0, se
             )
         )
 
-    return await utils.get_data(session=session, base_query=base_query, limit=limit, offset=offset)
+    gg = await get_data(session=session, base_query=base_query, limit=limit, offset=offset)
+    print(gg)
+    return gg
 
 
 async def get_device(session: AsyncSession, device_id: int) -> Device | None:

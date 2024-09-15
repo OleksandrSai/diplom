@@ -53,24 +53,5 @@ class UtilsOrm:
 
             await crud_statistic.create_statistic(session=session, statistic_in=statistic_in)
 
-    @staticmethod
-    async def get_data(session, base_query, limit, offset):
-        total_items = None
-        if limit:
-            subquery = base_query.subquery()
-            count_query = select(func.count()).select_from(subquery)
-            paginated_query = base_query.offset(offset).limit(limit)
-            total_items_result = await session.execute(count_query)
-            total_items = total_items_result.scalar()
-            result = await session.execute(paginated_query)
-        else:
-            result = await session.execute(base_query)
-
-        data = result.scalars().all()
-        if limit:
-            return list(data), total_items
-        else:
-            return list(data)
-
 
 utils = UtilsOrm()
