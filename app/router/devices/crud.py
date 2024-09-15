@@ -3,13 +3,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_, func
 from app.core.models import Device
 from .schemas import DevicesCreateDTO, DevicesUpdatePartialDTO, DevicesUpdateDTO
+from app.utils.orm import utils
 
 
 async def get_devices(session: AsyncSession, offset: int = 0, limit: int = 0, search: str = "") -> (
         tuple[list[Device], int] | list[Device]):
     base_query = select(Device).order_by(Device.id)
-
-    total_items = None
 
     if search:
         search_pattern = f"%{search}%"
@@ -19,21 +18,7 @@ async def get_devices(session: AsyncSession, offset: int = 0, limit: int = 0, se
             )
         )
 
-    if limit:
-        subquery = base_query.subquery()
-        count_query = select(func.count()).select_from(subquery)
-        paginated_query = base_query.offset(offset).limit(limit)
-        total_items_result = await session.execute(count_query)
-        total_items = total_items_result.scalar()
-        result = await session.execute(paginated_query)
-    else:
-        result = await session.execute(base_query)
-
-    devices = result.scalars().all()
-    if limit:
-        return list(devices), total_items
-    else:
-        return list(devices)
+    return await utils.get_data(session=session, base_query=base_query, limit=limit, offset=offset)
 
 
 async def get_device(session: AsyncSession, device_id: int) -> Device | None:
