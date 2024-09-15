@@ -3,6 +3,7 @@ from app.router.devices import crud
 from app.router.statistic import crud as crud_statistic
 from app.router.devices.schemas import DevicesDTO, DevicesCreateDTO
 from app.router.statistic.schemas import StatisticCreateDTO
+from zigpy.profiles.zha import DeviceType
 from app.core.models import Device
 from sqlalchemy import select
 from zigpy.types import EUI64
@@ -20,7 +21,7 @@ class UtilsOrm:
             return [DevicesDTO.model_validate(row).model_dump() for row in device]
 
     @staticmethod
-    async def add_device(nwk_adr: int, ieee: str):
+    async def add_device(nwk_adr: int, ieee: str, device_type: DeviceType):
         async with async_session_factory as session:
             query = select(Device).filter_by(nwk_adr=nwk_adr)
             res = await session.execute(query)
@@ -29,7 +30,8 @@ class UtilsOrm:
             else:
                 device_in = DevicesCreateDTO(
                     ieee=ieee,
-                    nwk_adr=nwk_adr
+                    nwk_adr=nwk_adr,
+                    type=device_type
                 )
                 print(session)
                 result = await crud.create_device(session, device_in=device_in)

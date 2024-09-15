@@ -15,6 +15,7 @@ import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeDeviceComponent } from './change-device/change-device.component';
+import { DeviceTypePipe } from '../../shared/pipe/device-type.pipe';
 
 @Component({
   selector: 'app-devices',
@@ -31,7 +32,9 @@ import { ChangeDeviceComponent } from './change-device/change-device.component';
     NzSwitchModule,
     NzCardModule,
     NzStatisticModule,
-    NzModalModule],
+    NzModalModule,
+    DeviceTypePipe],
+
   templateUrl: './devices.component.html',
   styleUrl: './devices.component.scss'
 })
@@ -43,6 +46,7 @@ export class DevicesComponent {
   aSub: Subscription | undefined;
   bSub: Subscription | undefined;
   cSub: Subscription | undefined;
+  dSub: Subscription | undefined;
   pageSizes: number [] = [10, 25, 50];
   _pageSize: string = "10";
   pageIndex: number = 1;
@@ -74,13 +78,12 @@ export class DevicesComponent {
   }
 
   openEditWindow(element:any): void {
+    if (this.dSub) this.dSub.unsubscribe;
     const dialogRef = this.dialog.open(ChangeDeviceComponent, {
       data: element
     });
 
-    dialogRef.afterClosed().subscribe((result:any) => {
-      console.log('Диалоговое окно закрыто', result);
-    });
+    this.dSub = dialogRef.afterClosed().subscribe((result:any) => this.loadData());
   }
 
   changeState(state:boolean, nwk_adr:number): void{
@@ -100,14 +103,6 @@ export class DevicesComponent {
   get pageSize(): number {
     return Number(this._pageSize);
   }
-
-
-
-
-
-
-
-
 
   onPageIndexChange(newPageIndex: number): void {
     this.pageIndex = newPageIndex
@@ -164,6 +159,7 @@ export class DevicesComponent {
     this.aSub = this.deviceService.getAllDevices(this.pageIndex, this.pageSize, this.searchText).subscribe((res: any) =>
 
       {
+        console.log(res)
         res.items.forEach((element:any) => {
           element.instantCurrent = null;
           element.instantVoltage = null;
@@ -203,6 +199,7 @@ export class DevicesComponent {
     this.aSub?.unsubscribe();
     this.bSub?.unsubscribe();
     this.cSub?.unsubscribe();
+    this.dSub?.unsubscribe();
   }
 
 }

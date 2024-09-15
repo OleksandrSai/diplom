@@ -18,15 +18,12 @@ class Listener:
 
     def device_initialized(self, device, *, new=True):
         print(f"new divice  ready {device}")
+
         if not isinstance(device, ZNPCoordinator):
             try:
-                asyncio.run(self.async_orm.add_device(nwk_adr=int(device.nwk), ieee=str(device.ieee)))
-            except:
+                device_type = device.endpoints[1].device_type
+                asyncio.run(self.async_orm.add_device(nwk_adr=int(device.nwk),
+                                                      ieee=str(device.ieee),
+                                                      device_type=device_type))
+            except (Exception,):
                 pass
-
-
-    def attribute_updated(self, cluster, attribute_id, value, date):
-        print(cluster)
-        if isinstance(cluster, ElectricalMeasurement):
-            name = ElectricalMeasurement.attributes[attribute_id].name
-            print(f"name {name} value {value}")

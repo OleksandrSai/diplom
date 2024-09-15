@@ -15,9 +15,6 @@ class Device(Base):
     name: Mapped[Optional[str_256]]
     type: Mapped[DeviceType]
     nwk_adr: Mapped[int]
-    status: Mapped[bool] = mapped_column(default=False)
-    date_turn_on: Mapped[Optional[datetime.datetime]]
-    date_turn_off: Mapped[Optional[datetime.datetime]]
 
 
 class Group(Base):

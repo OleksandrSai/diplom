@@ -9,9 +9,6 @@ class DevicesBaseDTO(BaseModel):
     name: Optional[str] = None
     type: DeviceType = Field(default=DeviceType(0x0000))
     nwk_adr: int
-    status: bool = Field(default=False)
-    date_turn_on: Optional[datetime] = None
-    date_turn_off: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -31,7 +28,10 @@ class DevicesUpdateDTO(DevicesCreateDTO):
 
 
 class DevicesUpdatePartialDTO(DevicesCreateDTO):
-    pass
+    ieee: Optional[str] = None
+    name: Optional[str] = None
+    type: Optional[DeviceType] = None
+    nwk_adr: Optional[int] = None
 
 
 class DevicesResponse(BaseModel):
