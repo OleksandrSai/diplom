@@ -10,8 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { StatisticService } from '../../shared/service/statistic.service';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartOptions, ChartType } from "chart.js";
+import { MatDialog } from '@angular/material/dialog';
+import { TrendComponent } from './trend/trend.component';
 
 @Component({
   selector: 'app-device',
@@ -24,18 +24,18 @@ import { ChartConfiguration, ChartOptions, ChartType } from "chart.js";
     CommonModule,
     NzInputModule,
     FormsModule,
-    NzButtonModule,
-    BaseChartDirective],
+    NzButtonModule],
   templateUrl: './device.component.html',
   styleUrl: './device.component.scss'
 })
 export class DeviceComponent {
 
-  constructor(private route: ActivatedRoute, private statisticService:StatisticService){}
+  constructor(private route: ActivatedRoute, private statisticService:StatisticService, public dialog: MatDialog){}
 
 
   aSub: Subscription | undefined;
   cSub: Subscription | undefined;
+  dSub: Subscription | undefined;
   pageSizes: number [] = [10, 25, 50];
   _pageSize: string = "10";
   pageIndex: number = 1;
@@ -43,13 +43,23 @@ export class DeviceComponent {
   pageId: number | undefined;
   totalItems: number | undefined
 
-  searchText:string=""
+  searchText:string= ""
 
 
   ngOnInit(): void {
     this.getPageId()
     this.loadData()
   }
+
+
+  openTrend(){
+    if (this.dSub) this.dSub.unsubscribe;
+    const dialogRef = this.dialog.open(TrendComponent, {
+      data: this.pageId
+    });
+    this.dSub = dialogRef.afterClosed().subscribe((result:any) => this.loadData());
+  }
+
 
   getPageId(){
     this.route.paramMap.subscribe(params => this.pageId = Number(params.get('id')))
@@ -61,7 +71,6 @@ export class DeviceComponent {
 
 
   onPageIndexChange(newPageIndex: number): void {
-    console.log(newPageIndex)
     this.pageIndex = newPageIndex
     this.loadData()
   }
@@ -77,7 +86,6 @@ export class DeviceComponent {
     console.log(this.pageId)
     this.aSub = this.statisticService.getDeviceStatistic(this.pageId as number, this.pageIndex, this.pageSize, this.searchText).subscribe((res: any) =>
       {
-        console.log(res)
         this.arrData = res.items as any[]
         this.totalItems = res.totalItems
       })
@@ -90,37 +98,6 @@ export class DeviceComponent {
     this.cSub?.unsubscribe();
   }
 
-
-
-
-
-  title = 'ng2-charts-demo';
-
-  public lineChartData: ChartConfiguration<'line'>['data'] = {
-    labels: [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July'
-    ],
-    datasets: [
-      {
-        data: [ 65, 59, 80, 81, 56, 55, 40 ],
-        label: 'average consumption KW/h',
-        fill: true,
-        tension: 0.5,
-        borderColor: 'black',
-        backgroundColor: 'rgba(255,0,0,0.3)'
-      }
-    ]
-  };
-  public lineChartOptions: ChartOptions<'line'> = {
-    responsive: false
-  };
-  public lineChartLegend = true;
 
 
 

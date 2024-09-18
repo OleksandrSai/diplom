@@ -6,10 +6,10 @@ from app.router.statistic.schemas import StatisticCreateDTO
 from zigpy.profiles.zha import DeviceType
 from app.core.models import Device
 from sqlalchemy import select
-from zigpy.types import EUI64
 import redis.asyncio as redis
 from app.utils.dependencies import get_redis
 import json
+from datetime import datetime
 
 
 class UtilsOrm:
@@ -52,6 +52,10 @@ class UtilsOrm:
                                               total_consumption=data["total_energy"])
 
             await crud_statistic.create_statistic(session=session, statistic_in=statistic_in)
+
+    @staticmethod
+    def parse_iso_date(date_str: str) -> datetime:
+        return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
 
 
 utils = UtilsOrm()

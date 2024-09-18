@@ -1,6 +1,6 @@
 .table {
     width: 100%;
-    padding: 50px 40px 10px 40px;
+    padding: 10px 40px 10px 40px;
     height: 100%;
     overflow-y: scroll;
     display: flex;
@@ -33,7 +33,7 @@
                 }
                 .ant-btn:active,
                 .ant-btn:focus {
-                    color: white;
+                    color: hsl(204, 100%, 45.5%);
                 }
                 .select_page_size {
                     display: flex;
@@ -61,5 +61,20 @@
         }
     }
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.ant-table-thead>tr>th,
+.ant-table-tbody>tr>td,
+.ant-table tfoot>tr>th,
+.ant-table tfoot>tr>td {
+    padding: 9px;
+}

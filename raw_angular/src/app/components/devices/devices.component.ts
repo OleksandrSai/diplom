@@ -16,6 +16,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeDeviceComponent } from './change-device/change-device.component';
 import { DeviceTypePipe } from '../../shared/pipe/device-type.pipe';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-devices',
@@ -33,7 +34,8 @@ import { DeviceTypePipe } from '../../shared/pipe/device-type.pipe';
     NzCardModule,
     NzStatisticModule,
     NzModalModule,
-    DeviceTypePipe],
+    DeviceTypePipe,
+    RouterModule],
 
   templateUrl: './devices.component.html',
   styleUrl: './devices.component.scss'
@@ -159,7 +161,7 @@ export class DevicesComponent {
     this.aSub = this.deviceService.getAllDevices(this.pageIndex, this.pageSize, this.searchText).subscribe((res: any) =>
 
       {
-        console.log(res)
+
         res.items.forEach((element:any) => {
           element.instantCurrent = null;
           element.instantVoltage = null;

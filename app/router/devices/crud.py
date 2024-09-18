@@ -18,9 +18,7 @@ async def get_devices(session: AsyncSession, offset: int = 0, limit: int = 0, se
             )
         )
 
-    gg = await get_data(session=session, base_query=base_query, limit=limit, offset=offset)
-    print(gg)
-    return gg
+    return await get_data(session=session, base_query=base_query, limit=limit, offset=offset)
 
 
 async def get_device(session: AsyncSession, device_id: int) -> Device | None:

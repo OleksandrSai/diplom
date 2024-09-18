@@ -1,5 +1,6 @@
 from aioredis import Redis
 from sqlalchemy import select, func
+from sqlalchemy.engine import Result
 
 
 async def get_redis() -> Redis:
@@ -15,9 +16,9 @@ async def get_data(session, base_query, limit, offset):
         paginated_query = base_query.offset(offset).limit(limit)
         total_items_result = await session.execute(count_query)
         total_items = total_items_result.scalar()
-        result = await session.execute(paginated_query)
+        result: Result = await session.execute(paginated_query)
     else:
-        result = await session.execute(base_query)
+        result: Result = await session.execute(base_query)
 
     data = result.scalars().all()
 

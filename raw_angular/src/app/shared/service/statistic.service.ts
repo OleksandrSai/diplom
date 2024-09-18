@@ -13,4 +13,8 @@ export class StatisticService {
     return this.http.get<any[]>(`/api/statistic/${deviceId}/?pageIndex=${pageIndex}&pageSize=${pageSize}&searchText=${searchText}`)
   }
 
+  getDataTrend(deviceId: number, dateRange: string): Observable<any[]>{
+    return this.http.get<any[]>(`/api/statistic/detail-stat/${deviceId}/?dateRange=${dateRange}`)
+  }
+
 }

@@ -2,11 +2,7 @@
     <div class="bord">
         <div class="menu-table">
             <div class="row" style="width: 100%;">
-
-                <div style="display: block">
-                    <canvas baseChart width="700" height="100" [type]="'line'" [data]="lineChartData">
-                </canvas>
-                </div>
+                <button nz-button nzType="default" (click)="openTrend()">Open trend</button>
 
                 <div class="select_page_size">
                     <div class="select_page_size_title">Items per page:</div>
